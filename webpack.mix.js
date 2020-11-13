@@ -17,3 +17,10 @@ mix.js('resources/js/app.js', 'public/js')
         require('tailwindcss'),
     ])
     .webpackConfig(require('./webpack.config'));
+
+
+
+
+
+mix.js('resources/js/project.js', 'public/js');
+mix.js('resources/js/employee.js', 'public/js');

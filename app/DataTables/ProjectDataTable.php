@@ -20,7 +20,16 @@ class ProjectDataTable extends DataTable
     public function dataTable($query)
     {
        return datatables()
-            ->eloquent($query);
+            ->eloquent($query)
+            ->addIndexColumn()
+            ->addColumn('action', function ($row) {
+                $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Edit" class="edit btn btn-primary btn-sm editProject">Edit</a>';
+
+                $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteProject">Delete</a>';
+
+                return $btn;
+            });
+
     }
 
     /**
@@ -42,13 +51,14 @@ class ProjectDataTable extends DataTable
     public function html()
     {
         return $this->builder()
-                    ->setTableId('projects-table')
+                    ->setTableId('dataT')
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     ->orderBy(1)
+                    ->dom('Bfrtip')
                     ->parameters([
                         'dom'          => 'Bfrtip',
-                        'buttons'      => ['excel', 'csv'],
+                        'buttons'      => ['excel', 'pdf'],
                     ]);
     }
 

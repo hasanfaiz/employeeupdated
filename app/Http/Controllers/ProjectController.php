@@ -7,34 +7,20 @@ use App\Models\Project;
 use DataTables;
 use Illuminate\Support\Facades\Validator;
 use App\DataTables\ProjectDataTable;
+use App\Http\Requests\ProjectRequest;
+use App\Traits\ProjectTrait;
+use Exception;
 
 class ProjectController extends Controller
 {
+    use ProjectTrait;
     //
-    public function index(Request $request)
+    public function index(Request $request, ProjectDataTable $dataTable)
 
     {
-
-        if ($request->ajax()) {
-            $data = Project::latest()->get();
-            return Datatables::of($data)
-                    ->addIndexColumn()
-                    ->addColumn('action', function($row){
-   
-                           $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editProject">Edit</a>';
-   
-                           $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-danger btn-sm deleteProject">Delete</a>';
-    
-                            return $btn;
-                    })
-                    ->rawColumns(['action'])
-                    ->make(true);	
-        }
-      
-        return view('project.index');
+             return $dataTable->render('project.index');
 
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -42,31 +28,40 @@ class ProjectController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProjectRequest $request)
     {
+        try {
+            $response = $this->createOrUpdateProject($request->all(), $request->project_id);
+            if ($response['status'] == 'success') {
+
+                notify()->success($response['message'], $response['title']);
+            }
+            //return response()->json(['success' => 'Project Saved Successfully.']);
+            return redirect()->route('/project');
 
 
-         $validator = Validator::make($request->all(), [
-            'project_name' => 'required',
-        ]);
-
-
-
-    	  if ($validator->fails())
-        {
-            return response()->json(['errors'=>$validator->errors()->all()]);
+        } catch (Exception $e) {
+            return response()->json($e);
         }
 
-
-        Project::updateOrCreate(
-        	['id' => $request->project_id],
-                ['project_name' => $request->project_name]
-            );        
-   
-        return response()->json(['success'=>'Project saved successfully.']);
     }
 
-/**
+    /**
+     * Unique validation for the name field.
+     * @param  Request $request
+     * @return [boolean]
+     */
+    public function uniqueValidation(Request $request)
+    {
+        try {
+            return $this->performUniqueValidationOfProject($request);
+        } catch (Exception $e) {
+            /*$response = handleExceptionAndLog($e, 'Customer', $this->account, $request, 'uniqueValidation() ');
+            return response()->json($response);*/
+            return response()->json($e);
+        }
+    }
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Project  $project
@@ -87,10 +82,7 @@ class ProjectController extends Controller
     public function destroy($id)
     {
         Project::find($id)->delete();
-     
-        return response()->json(['success'=>'Project deleted successfully.']);
+
+        return response()->json(['success' => 'Project deleted successfully.']);
     }
-
-
-
 }

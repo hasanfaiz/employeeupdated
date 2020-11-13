@@ -21,39 +21,31 @@ Route::get('/', function () {
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('dashboard');
-
-
 })->name('dashboard');
-
-
-/*Route::middleware(['auth:sanctum', 'verified'])->get('/employee', function () {
-    return view('employee');
-})->name('employee');*/
-
-
-/*Route::middleware(['auth:sanctum', 'verified'])->get('/project', function () {
-    return view('project.index');
-})->name('project');*/
-
 
 
 Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
 
-Route::resource('/project',ProjectController::class);
-Route::resource('/employee',EmployeeController::class);
+//Route::resource('/project',ProjectController::class);
+Route::post('/project', [ProjectController::class, 'store']);
+Route::post('/projectvalidation', [ProjectController::class, 'uniqueValidation']);
+Route::get('/project', [ProjectController::class, 'index']);
+Route::get('/project/create', [ProjectController::class, 'create']);
+Route::put('/project/{project}', [ProjectController::class, 'update']);
+Route::get('/project/{project}/edit', [ProjectController::class, 'edit']);
+Route::delete('/project/{project}/delete', [ProjectController::class, 'destroy']);
+
+//Route::resource('/employee',EmployeeController::class);
+
+Route::get('/employee/{employee_id}/imagedelete/{filename}', [EmployeeController::class, 'imagedelete']);
+Route::post('/employee', [EmployeeController::class, 'store']);
+Route::post('/employeevalidation', [EmployeeController::class, 'uniqueValidation']);
+Route::get('/employee', [EmployeeController::class, 'index']);
+Route::get('/employee/create', [EmployeeController::class, 'create']);
+Route::put('/employee/{employee_id}', [EmployeeController::class, 'update']);
+Route::get('/employee/{employee_id}/edit', [EmployeeController::class, 'edit']);
+Route::delete('/employee/{employee_id}/delete', [EmployeeController::class, 'destroy']);
+
+
 
 });
-
-
-
-
-
-//Route::get('/employee}', [EmployeeController::class, 'employee.index']);
-//Route::get('/employee/{id}', [EmployeeController::class, 'edit']);
-
-
-
-         /*   Route::resource('/employee', 'EmployeeController', ['except' => ['show'], 'names' => ['index' => 'employee.index', 'create' => 'employee.create', 'store' => 'employee.index', 'edit' => 'employee.edit', 'update' => 'employee.edit', 'destroy' => 'employee.destroy']]);
-*/
-
-//Route::get('/project', [ProjectController::class, 'project.index']);
